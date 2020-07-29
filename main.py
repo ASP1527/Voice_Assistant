@@ -134,7 +134,7 @@ def main_loop():
     while running_main_loop:
 
         text = get_audio()
-        #text = "news"
+        #text = ""
 
         if "weather" in text:
             get_weather_today()
