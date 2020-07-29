@@ -68,6 +68,44 @@ def get_weather_today():
         remove_file()
 
 
+def get_news():
+    page = requests.get('https://www.bbc.co.uk/news')
+    soup = BeautifulSoup(page.content, 'html.parser')
+    # print(soup)
+    mainHeadline = soup.find(
+        class_='gs-c-promo-heading__title gel-paragon-bold nw-o-link-split__text')
+
+    headline1 = mainHeadline.get_text()
+
+    secondaryHeadlines = soup.find_all(
+        class_='gs-c-promo-heading__title gel-pica-bold nw-o-link-split__text')
+
+    headline2 = secondaryHeadlines[0].get_text()
+
+    headline3 = secondaryHeadlines[1].get_text()
+
+    speak("Here are the top 3 headlines for today on BBC News")
+    remove_file()
+    speak(headline1)
+    remove_file()
+    speak(headline2)
+    remove_file()
+    speak(headline3)
+    remove_file()
+
+
+def get_time():
+    tie = time()
+    timeData = ctime(tie)
+    splitData = timeData.split(" ")
+    times = splitData[3]
+    times = times.split(":")
+    hour = times[0]
+    minutes = times[1]
+    speak("It's " + hour + minutes)
+    remove_file()
+
+
 '''
 end of functions
 '''
@@ -83,6 +121,7 @@ def calling_assistant():
     running_main_loop = False
     while not running_main_loop:
         text = get_audio()
+        #text = "hello"
         if "hello" in text:
             speak("Hello, how can I help?")
             remove_file()
@@ -95,9 +134,14 @@ def main_loop():
     while running_main_loop:
 
         text = get_audio()
+        #text = "news"
 
         if "weather" in text:
             get_weather_today()
+        elif "news" in text:
+            get_news()
+        elif "time" in text:
+            get_time()
         else:
             speak("I am not sure how to do that at the moment")
             remove_file()
