@@ -7,6 +7,13 @@ from gtts import gTTS
 from bs4 import BeautifulSoup
 import requests
 from time import time, ctime
+import random
+import wikipedia as wiki
+
+
+global calls
+calls = ["Hello, how can I help?", "What can I do for you?", "What's the time? Its time for me to help",
+         "How may I help you?", "Who do you call? Me", "000110101 oops I mean what do you need help with?"]
 
 
 # Function that allows the assistant to speak
@@ -55,7 +62,7 @@ def get_weather_today():
     tie = time()
     timeData = ctime(tie)
     splitData = timeData.split(" ")
-    times = splitData[3]
+    times = splitData[4]
     times = times.split(":")
     hour = times[0]
     hour = int(hour)
@@ -98,11 +105,21 @@ def get_time():
     tie = time()
     timeData = ctime(tie)
     splitData = timeData.split(" ")
-    times = splitData[3]
+    times = splitData[4]
     times = times.split(":")
     hour = times[0]
     minutes = times[1]
-    speak("It's " + hour + minutes)
+    speak("It's " + hour + " " + minutes)
+    remove_file()
+
+
+def wiki_search():
+    speak("What would you like to search for?")
+    remove_file()
+    toFind = get_audio()
+    #toFind = "india"
+    info = wiki.summary(toFind, sentences=2)
+    speak(info)
     remove_file()
 
 
@@ -119,11 +136,13 @@ run = False
 def calling_assistant():
     global running_main_loop
     running_main_loop = False
+    randomCall = random.randint(0, len(calls)-1)
+    randomC = calls[randomCall]
     while not running_main_loop:
         text = get_audio()
-        #text = "hello"
-        if "hello" in text:
-            speak("Hello, how can I help?")
+        #text = "friday"
+        if "friday" in text or "Friday" in text:
+            speak(randomC)
             remove_file()
             running_main_loop = True
             main_loop()
@@ -134,7 +153,7 @@ def main_loop():
     while running_main_loop:
 
         text = get_audio()
-        #text = ""
+        #text = "search"
 
         if "weather" in text:
             get_weather_today()
@@ -142,6 +161,8 @@ def main_loop():
             get_news()
         elif "time" in text:
             get_time()
+        elif "search" in text:
+            wiki_search()
         else:
             speak("I am not sure how to do that at the moment")
             remove_file()
