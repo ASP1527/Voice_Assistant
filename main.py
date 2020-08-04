@@ -9,6 +9,8 @@ import requests
 from time import time, ctime
 import random
 import wikipedia as wiki
+import config
+import smtplib
 
 
 global calls
@@ -123,6 +125,30 @@ def wiki_search():
     remove_file()
 
 
+def send_email():
+    try:
+        emailAddress = "pythonautomator1@gmail.com"
+        emailPassword = "Python1234"
+        server = smtplib.SMTP('smtp.gmail.com:587')
+        server.ehlo()
+        server.starttls()
+        server.login(emailAddress, emailPassword)
+        speak("What's the subject?")
+        remove_file()
+        subject = get_audio()
+        #subject = "tester"
+        speak("What's the message?")
+        remove_file()
+        msg = get_audio()
+        #msg = "something"
+        message = 'Subject: {}\n\n{}'.format(subject, msg)
+        server.sendmail(emailAddress, config.email_address, message)
+        server.quit()
+        print("Success")
+    except:
+        print("failed")
+
+
 '''
 end of functions
 '''
@@ -153,7 +179,7 @@ def main_loop():
     while running_main_loop:
 
         text = get_audio()
-        #text = "search"
+        #text = "send email"
 
         if "weather" in text:
             get_weather_today()
@@ -163,6 +189,8 @@ def main_loop():
             get_time()
         elif "search" in text:
             wiki_search()
+        elif "send" in text and "email" in text:
+            send_email()
         else:
             speak("I am not sure how to do that at the moment")
             remove_file()
