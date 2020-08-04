@@ -116,13 +116,17 @@ def get_time():
 
 
 def wiki_search():
-    speak("What would you like to search for?")
-    remove_file()
-    toFind = get_audio()
-    #toFind = "india"
-    info = wiki.summary(toFind, sentences=2)
-    speak(info)
-    remove_file()
+    try:
+        speak("What would you like to search for?")
+        remove_file()
+        toFind = get_audio()
+        #toFind = "python"
+        info = wiki.summary(toFind, sentences=2)
+        speak(info)
+        remove_file()
+    except:
+        speak("An error has occured, please try again later.")
+        remove_file()
 
 
 def send_email():
@@ -144,9 +148,11 @@ def send_email():
         message = 'Subject: {}\n\n{}'.format(subject, msg)
         server.sendmail(emailAddress, config.email_address, message)
         server.quit()
-        print("Success")
+        speak("The email has been sent.")
+        remove_file()
     except:
-        print("failed")
+        speak("An error has occured, please try again later.")
+        remove_file()
 
 
 '''
@@ -179,7 +185,7 @@ def main_loop():
     while running_main_loop:
 
         text = get_audio()
-        #text = "send email"
+        #text = "search"
 
         if "weather" in text:
             get_weather_today()
