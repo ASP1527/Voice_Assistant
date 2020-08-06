@@ -132,7 +132,7 @@ def wiki_search():
 def send_email():
     try:
         emailAddress = "pythonautomator1@gmail.com"
-        emailPassword = "Python1234"
+        emailPassword = ""
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.ehlo()
         server.starttls()
