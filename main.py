@@ -9,72 +9,8 @@ import requests
 from time import time, ctime
 import random
 import wikipedia as wiki
-import smtplib
-import tkinter as tk
-from tkinter import filedialog, Text
-import os
 import config
-
-
-transcribe = []
-
-
-configured = False
-
-if os.path.isfile('config.py'):
-    configured = True
-
-if configured == False:
-    root = tk.Tk()
-    items = []
-    root.title('Configuring')
-
-    canvas = tk.Canvas(root, height=700, width=800, bg="#008080")
-    canvas.pack()
-
-    frame = tk.Frame(root, bg="white")
-    frame.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.1)
-
-    def addToFile():
-        item = e.get()
-        item = str(item)
-        items.append(item)
-        for widget in frame.winfo_children():
-            widget.destroy()
-        for i in range(0, len(items)):
-            label = tk.Label(frame, text=items[i], bg="#C0C0C0")
-            label.pack()
-        if len(items) > 2:
-            root.destroy()
-
-    label = tk.Label(
-        text="Enter 3 Email Addresses that you would like to send emails to using this voice assistant:")
-    label.pack()
-
-    e = tk.Entry(root, width=50)
-    e.pack()
-
-    add = tk.Button(root, text="Click", padx=10, pady=5, fg="white",
-                    bg="#C0C0C0", font=('helvetica', 9), command=addToFile)
-    add.pack()
-
-    root.mainloop()
-
-    with open('config.py', 'w') as f:
-        f.write("email_address = ")
-        f.write('"')
-        f.write(items[0])
-        f.write('"')
-        f.write("\n")
-        f.write("email_address2 = ")
-        f.write('"')
-        f.write(items[1])
-        f.write('"')
-        f.write("\n")
-        f.write("email_address3 = ")
-        f.write('"')
-        f.write(items[2])
-        f.write('"')
+import smtplib
 
 
 global calls
@@ -88,9 +24,6 @@ def speak(text):
     filename = "voice.mp3"
     tts.save(filename)
     playsound.playsound(filename)
-    f = open('transcript.txt', 'a')
-    f.write(text)
-    f.write('\n')
 
 
 # Function that allows audio from the microphone to be recognised
@@ -131,7 +64,7 @@ def get_weather_today():
     tie = time()
     timeData = ctime(tie)
     splitData = timeData.split(" ")
-    times = splitData[3]
+    times = splitData[4]
     times = times.split(":")
     hour = times[0]
     hour = int(hour)
@@ -174,7 +107,7 @@ def get_time():
     tie = time()
     timeData = ctime(tie)
     splitData = timeData.split(" ")
-    times = splitData[3]
+    times = splitData[4]
     times = times.split(":")
     hour = times[0]
     minutes = times[1]
@@ -199,7 +132,7 @@ def wiki_search():
 def send_email():
     try:
         emailAddress = "pythonautomator1@gmail.com"
-        emailPassword = ""
+        emailPassword = "Python1234"
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.ehlo()
         server.starttls()
@@ -228,15 +161,19 @@ def get_date():
     splitData = timeData.split(" ")
     day = splitData[0]
     month = splitData[1]
-    date1 = splitData[3]
+    date1 = splitData[2]
     date = (day + " " + month + " " + date1)
     speak(date)
     remove_file()
 
 
-def reset_email_addresses():
-    os.remove('config.py')
-    speak("I have removed the email addresses, please restart the program to reset them.")
+def get_day():
+    tie = time()
+    timeData = ctime(tie)
+    splitData = timeData.split(" ")
+    day = splitData[0]
+    today = (day + "day")
+    speak(today)
     remove_file()
 
 
@@ -256,9 +193,9 @@ def calling_assistant():
     randomCall = random.randint(0, len(calls)-1)
     randomC = calls[randomCall]
     while not running_main_loop:
-        #text = get_audio()
-        text = "hello"
-        if "hello" in text or "Friday" in text:
+        text = get_audio()
+        #text = "friday"
+        if "friday" in text or "Friday" in text:
             speak(randomC)
             remove_file()
             running_main_loop = True
@@ -269,8 +206,8 @@ def main_loop():
     running_main_loop = True
     while running_main_loop:
 
-        #text = get_audio()
-        text = "time"
+        text = get_audio()
+        #text = "search"
 
         if "weather" in text:
             get_weather_today()
@@ -282,10 +219,10 @@ def main_loop():
             wiki_search()
         elif "send" in text and "email" in text:
             send_email()
-        elif "date" in text or "day" in text or "month" in text:
+        elif "date" in text or "month" in text:
             get_date()
-        elif ("reset" in text or "remove" in text) and ("email" in text or "emails" in text):
-            reset_email_addresses()
+        elif "day" in text:
+            get_day()
         else:
             speak("I am not sure how to do that at the moment")
             remove_file()
