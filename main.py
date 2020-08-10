@@ -1,4 +1,3 @@
-
 # List of modules that I have imported
 import os
 import playsound
@@ -9,8 +8,59 @@ import requests
 from time import time, ctime
 import random
 import wikipedia as wiki
-import config
 import smtplib
+import tkinter as tk
+from tkinter import filedialog, Text
+import os
+import config
+transcribe = []
+configured = False
+if os.path.isfile('config.py'):
+    configured = True
+if configured == False:
+    root = tk.Tk()
+    items = []
+    root.title('Configuring')
+    canvas = tk.Canvas(root, height=700, width=800, bg="#008080")
+    canvas.pack()
+    frame = tk.Frame(root, bg="white")
+    frame.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.1)
+
+    def addToFile():
+        item = e.get()
+        item = str(item)
+        items.append(item)
+        for widget in frame.winfo_children():
+            widget.destroy()
+        for i in range(0, len(items)):
+            label = tk.Label(frame, text=items[i], bg="#C0C0C0")
+            label.pack()
+        if len(items) > 2:
+            root.destroy()
+    label = tk.Label(
+        text="Enter 3 Email Addresses that you would like to send emails to using this voice assistant:")
+    label.pack()
+    e = tk.Entry(root, width=50)
+    e.pack()
+    add = tk.Button(root, text="Click", padx=10, pady=5, fg="white",
+                    bg="#C0C0C0", font=('helvetica', 9), command=addToFile)
+    add.pack()
+    root.mainloop()
+    with open('config.py', 'w') as f:
+        f.write("email_address = ")
+        f.write('"')
+        f.write(items[0])
+        f.write('"')
+        f.write("\n")
+        f.write("email_address2 = ")
+        f.write('"')
+        f.write(items[1])
+        f.write('"')
+        f.write("\n")
+        f.write("email_address3 = ")
+        f.write('"')
+        f.write(items[2])
+        f.write('"')
 
 
 global calls
@@ -132,11 +182,28 @@ def wiki_search():
 def send_email():
     try:
         emailAddress = "pythonautomator1@gmail.com"
-        emailPassword = "Python1234"
+        emailPassword = ""
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.ehlo()
         server.starttls()
         server.login(emailAddress, emailPassword)
+        speak("Who is the recipient?")
+        remove_file()
+        speak(config.email_address)
+        remove_file()
+        speak(config.email_address2)
+        remove_file()
+        speak("or")
+        remove_file()
+        speak(config.email_address2)
+        remove_file()
+        text = get_audio()
+        if "1" in text or "one" in text:
+            recipient = config.email_address
+        elif "2" in text or "two" in text:
+            recipient = config.email_address2
+        elif "3" in text or "three" in text:
+            recipient = config.email_address3
         speak("What's the subject?")
         remove_file()
         subject = get_audio()
@@ -146,7 +213,7 @@ def send_email():
         msg = get_audio()
         #msg = "something"
         message = 'Subject: {}\n\n{}'.format(subject, msg)
-        server.sendmail(emailAddress, config.email_address, message)
+        server.sendmail(emailAddress, recipient, message)
         server.quit()
         speak("The email has been sent.")
         remove_file()
